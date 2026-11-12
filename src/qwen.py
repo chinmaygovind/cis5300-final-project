@@ -1,6 +1,5 @@
 import torch
 from PIL import Image
-from tqdm import tqdm
 from transformers import AutoProcessor, AutoModelForImageTextToText
 
 from model import Model
@@ -11,16 +10,13 @@ MODEL = 'Qwen/Qwen3.5-4B'
 class Qwen(Model):
     """Zero-shot Qwen3.5-4B: show the cartoon and the captions, ask for one letter. Ignores train."""
 
-    def __init__(self, train):
-        super().__init__(train)
+    def __init__(self, train, task):
+        super().__init__(train, task)
         self.proc = AutoProcessor.from_pretrained(MODEL, min_pixels=256 * 32 * 32, max_pixels=512 * 512)
         self.model = AutoModelForImageTextToText.from_pretrained(MODEL, dtype=torch.bfloat16, device_map='cuda')
 
-    def predict(self, test):
-        return [self.ask(ex) for ex in tqdm(test)]
-
-    def ask(self, ex):
-        if 'choices' in ex:
+    def predict_one(self, ex):
+        if self.task == 'matching':
             q, opts, labels = 'Choose the caption originally written for this cartoon.', ex['choices'], 'A, B, C, D, or E'
         else:
             q, opts, labels = ('Choose the caption that New Yorker caption-contest readers rated as funnier for this cartoon.',
