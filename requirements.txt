@@ -1,0 +1,6 @@
+datasets
+# qwen.py only (GPU):
+torch
+transformers>=5.3
+accelerate
+Pillow

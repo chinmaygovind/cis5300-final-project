@@ -1,0 +1,10 @@
+# secrets
+Microsoft Azure Login Info.docx
+# big or regenerable data (rebuild with Milestone 1/data/build_m1_data.py)
+*.tar.gz
+*.zip
+**/data/images/
+# Google Docs placeholders (0-byte .docx; the real docs live in Drive)
+*.docx
+__pycache__/
+.venv/

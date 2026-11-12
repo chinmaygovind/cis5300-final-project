@@ -1,0 +1,97 @@
+{
+  "matching": {
+    "train": {
+      "n": 4896,
+      "contests": 422,
+      "labels": {
+        "C": 902,
+        "A": 987,
+        "D": 1005,
+        "B": 971,
+        "E": 1031
+      },
+      "tiers": {
+        "not applicable": 4896
+      },
+      "missing_image_rows": 4896,
+      "sha256": "2c3764394e47be9910d66c6248cd8c305525064f25e8d502d1c8eada6f9892e2"
+    },
+    "dev": {
+      "n": 531,
+      "contests": 141,
+      "labels": {
+        "D": 97,
+        "A": 111,
+        "E": 105,
+        "B": 104,
+        "C": 114
+      },
+      "tiers": {
+        "not applicable": 531
+      },
+      "missing_image_rows": 0,
+      "sha256": "d32c58845a73ee7dacf973ba6ebbd9c9cb5f60d220672299c2840919e2b78dbc"
+    },
+    "test": {
+      "n": 528,
+      "contests": 141,
+      "labels": {
+        "B": 110,
+        "E": 97,
+        "A": 98,
+        "D": 122,
+        "C": 101
+      },
+      "tiers": {
+        "not applicable": 528
+      },
+      "missing_image_rows": 0,
+      "sha256": "5731f2ec65083ae755c55f6aa213e15fea864febc6cb33a1dbd1b9e179f3e52b"
+    }
+  },
+  "ranking": {
+    "train": {
+      "n": 5420,
+      "contests": 271,
+      "labels": {
+        "A": 2660,
+        "B": 2760
+      },
+      "tiers": {
+        "easy": 2710,
+        "hard": 2710
+      },
+      "missing_image_rows": 5420,
+      "sha256": "04cf073c3f7094e75d7f4693650272423c8cd5cb62a80f6c93d8b9cc90baf18d"
+    },
+    "dev": {
+      "n": 880,
+      "contests": 44,
+      "labels": {
+        "A": 449,
+        "B": 431
+      },
+      "tiers": {
+        "easy": 440,
+        "hard": 440
+      },
+      "missing_image_rows": 0,
+      "sha256": "b22597235d73bcd54a5e7110ec83a511267516d1ba62bec2363a298aaadb586d"
+    },
+    "test": {
+      "n": 940,
+      "contests": 47,
+      "labels": {
+        "A": 470,
+        "B": 470
+      },
+      "tiers": {
+        "easy": 470,
+        "hard": 470
+      },
+      "missing_image_rows": 0,
+      "sha256": "3af97f09474a41b261d3b704afbe9cfea1f2196fd7606f052a28cf5648989562"
+    }
+  },
+  "within_task_contest_overlap": 0
+}

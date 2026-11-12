@@ -1,0 +1,127 @@
+{
+  "scope": "ranking dev only; no test inference or model tuning",
+  "original_accuracy": {
+    "task": "ranking",
+    "overall": {
+      "n": 880,
+      "correct": 447,
+      "accuracy": 0.5079545454545454,
+      "accuracy_percent": 50.79545454545455,
+      "invalid": 0
+    },
+    "by_tier": {
+      "easy": {
+        "n": 440,
+        "correct": 213,
+        "accuracy": 0.48409090909090907,
+        "accuracy_percent": 48.40909090909091,
+        "invalid": 0
+      },
+      "hard": {
+        "n": 440,
+        "correct": 234,
+        "accuracy": 0.5318181818181819,
+        "accuracy_percent": 53.18181818181818,
+        "invalid": 0
+      }
+    }
+  },
+  "swapped_accuracy": {
+    "task": "ranking",
+    "overall": {
+      "n": 880,
+      "correct": 470,
+      "accuracy": 0.5340909090909091,
+      "accuracy_percent": 53.40909090909091,
+      "invalid": 0
+    },
+    "by_tier": {
+      "easy": {
+        "n": 440,
+        "correct": 249,
+        "accuracy": 0.5659090909090909,
+        "accuracy_percent": 56.59090909090909,
+        "invalid": 0
+      },
+      "hard": {
+        "n": 440,
+        "correct": 221,
+        "accuracy": 0.5022727272727273,
+        "accuracy_percent": 50.22727272727273,
+        "invalid": 0
+      }
+    }
+  },
+  "paired_diagnostic": {
+    "n": 880,
+    "valid_in_both_orders": 880,
+    "invalid_in_either_order": 0,
+    "transitions_original_to_swapped": {
+      "A->B": 68,
+      "B->A": 91,
+      "B->B": 721
+    },
+    "same_caption_count": 159,
+    "same_caption_percent_of_valid": 18.068181818181817,
+    "same_letter_count": 721,
+    "same_letter_percent_of_valid": 81.93181818181819,
+    "correct_in_both_orders_count": 98,
+    "original_B_count": 812,
+    "original_B_percent_of_all": 92.27272727272727,
+    "swapped_B_count": 789,
+    "swapped_B_percent_of_all": 89.6590909090909
+  },
+  "by_tier": {
+    "easy": {
+      "n": 440,
+      "valid_in_both_orders": 440,
+      "invalid_in_either_order": 0,
+      "transitions_original_to_swapped": {
+        "A->B": 41,
+        "B->A": 47,
+        "B->B": 352
+      },
+      "same_caption_count": 88,
+      "same_caption_percent_of_valid": 20.0,
+      "same_letter_count": 352,
+      "same_letter_percent_of_valid": 80.0,
+      "correct_in_both_orders_count": 55,
+      "original_B_count": 399,
+      "original_B_percent_of_all": 90.68181818181819,
+      "swapped_B_count": 393,
+      "swapped_B_percent_of_all": 89.31818181818181
+    },
+    "hard": {
+      "n": 440,
+      "valid_in_both_orders": 440,
+      "invalid_in_either_order": 0,
+      "transitions_original_to_swapped": {
+        "A->B": 27,
+        "B->A": 44,
+        "B->B": 369
+      },
+      "same_caption_count": 71,
+      "same_caption_percent_of_valid": 16.136363636363637,
+      "same_letter_count": 369,
+      "same_letter_percent_of_valid": 83.86363636363636,
+      "correct_in_both_orders_count": 43,
+      "original_B_count": 413,
+      "original_B_percent_of_all": 93.86363636363636,
+      "swapped_B_count": 396,
+      "swapped_B_percent_of_all": 90.0
+    }
+  },
+  "interpretation": {
+    "same_caption": "A->B or B->A: the selected caption stays the same when it moves.",
+    "same_letter": "A->A or B->B: the selected caption changes while the answer position stays fixed.",
+    "caution": "This paired test measures order sensitivity in this setup. It does not isolate a cultural cause or establish a universal model property."
+  },
+  "provenance": {
+    "model_commit": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "original_gold_sha256": "b22597235d73bcd54a5e7110ec83a511267516d1ba62bec2363a298aaadb586d",
+    "swapped_gold_sha256": "9814b4664dc1ac27199cdd5da93cf6b34621d67109cb0748f3d7be0517d7b33a",
+    "original_predictions_sha256": "1062e219ce3c0a4f4a3b78779493966fc017ac7b4d39cb062d19c3ce90fc58ad",
+    "swapped_predictions_sha256": "bca6a2ee83942769a05035c45352de66e6c935a3b7a24fb8fa02e8a221181d12",
+    "environment_matches_reference": true
+  }
+}

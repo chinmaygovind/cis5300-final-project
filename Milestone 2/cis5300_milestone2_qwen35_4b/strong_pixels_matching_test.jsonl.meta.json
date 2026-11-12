@@ -1,0 +1,31 @@
+{
+  "config": {
+    "task": "matching",
+    "model": "Qwen/Qwen3.5-4B",
+    "requested_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "mode": "pixels",
+    "max_pixels": 262144,
+    "max_new_tokens": 16,
+    "do_sample": false,
+    "enable_thinking": false,
+    "prompt_version": "m2-v1",
+    "input_sha256": "5731f2ec65083ae755c55f6aa213e15fea864febc6cb33a1dbd1b9e179f3e52b",
+    "limit": null,
+    "n": 528
+  },
+  "resolved_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "python": "3.13.16",
+  "torch": "2.15.0+cu132",
+  "transformers": "5.22.2",
+  "gpu": "NVIDIA L4",
+  "dtype": "torch.bfloat16",
+  "status": "complete",
+  "packages": {
+    "torch": "2.15.0",
+    "transformers": "5.22.2",
+    "accelerate": "1.15.0",
+    "huggingface-hub": "2.4.0",
+    "Pillow": "13.0.0"
+  },
+  "seconds_this_session": 195.19889122699988
+}

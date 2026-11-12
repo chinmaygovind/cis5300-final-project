@@ -1,0 +1,26 @@
+{
+  "task": "ranking",
+  "overall": {
+    "n": 940,
+    "correct": 484,
+    "accuracy": 0.5148936170212766,
+    "accuracy_percent": 51.48936170212766,
+    "invalid": 0
+  },
+  "by_tier": {
+    "easy": {
+      "n": 470,
+      "correct": 248,
+      "accuracy": 0.5276595744680851,
+      "accuracy_percent": 52.765957446808514,
+      "invalid": 0
+    },
+    "hard": {
+      "n": 470,
+      "correct": 236,
+      "accuracy": 0.502127659574468,
+      "accuracy_percent": 50.212765957446805,
+      "invalid": 0
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "method": "training majority",
+  "task": "matching",
+  "majority": "E",
+  "counts": {
+    "C": 902,
+    "A": 987,
+    "D": 1005,
+    "B": 971,
+    "E": 1031
+  },
+  "train_sha256": "2c3764394e47be9910d66c6248cd8c305525064f25e8d502d1c8eada6f9892e2",
+  "input_sha256": "5731f2ec65083ae755c55f6aa213e15fea864febc6cb33a1dbd1b9e179f3e52b",
+  "n": 528
+}

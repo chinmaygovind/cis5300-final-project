@@ -1,0 +1,12 @@
+{
+  "method": "training majority",
+  "task": "ranking",
+  "majority": "B",
+  "counts": {
+    "A": 2660,
+    "B": 2760
+  },
+  "train_sha256": "04cf073c3f7094e75d7f4693650272423c8cd5cb62a80f6c93d8b9cc90baf18d",
+  "input_sha256": "3af97f09474a41b261d3b704afbe9cfea1f2196fd7606f052a28cf5648989562",
+  "n": 940
+}
