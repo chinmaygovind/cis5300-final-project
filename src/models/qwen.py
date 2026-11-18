@@ -2,16 +2,14 @@ import torch
 from PIL import Image
 from transformers import AutoProcessor, AutoModelForImageTextToText
 
-from model import Model
-
 MODEL = 'Qwen/Qwen3.5-4B'
 
 
-class Qwen(Model):
+class Qwen:
     """Zero-shot Qwen3.5-4B: show the cartoon and the captions, ask for one letter. Ignores train."""
 
     def __init__(self, train, task):
-        super().__init__(train, task)
+        self.task = task
         self.proc = AutoProcessor.from_pretrained(MODEL, min_pixels=256 * 32 * 32, max_pixels=512 * 512)
         self.model = AutoModelForImageTextToText.from_pretrained(MODEL, dtype=torch.bfloat16, device_map='cuda')
 

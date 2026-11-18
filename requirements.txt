@@ -1,6 +1,7 @@
 datasets
-# qwen.py only (GPU):
+# models/qwen.py only (GPU):
 torch
+torchvision
 transformers>=5.3
 accelerate
 Pillow

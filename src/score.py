@@ -1,28 +1,29 @@
-"""Usage: python src/score.py <src/some_model.py> <matching|ranking> [dev|test]"""
-import importlib
+"""usage: python score.py <true.jsonl> <predictions.jsonl>"""
+import json
 import sys
-from pathlib import Path
-
-from data import TASKS, load_split
-from model import Model
 
 
-def accuracy(predictions, labels):
-    return sum(p == l for p, l in zip(predictions, labels)) / len(labels)
+
+def read_jsonl(path):
+    with open(path) as f:
+        return [json.loads(line) for line in f]
+
+def row_id(row):
+    return row.get('pair_id') or row.get('instance_id')
 
 
-if len(sys.argv) not in (3, 4) or sys.argv[2] not in TASKS:
-    sys.exit(__doc__)
-path, task = sys.argv[1], sys.argv[2]
-split = sys.argv[3] if len(sys.argv) == 4 else 'test'
+def accuracy(true_rows, preds):
+    return sum(1 for row in true_rows if preds.get(row_id(row)) == row['label']) / len(true_rows)
 
-importlib.import_module(Path(path).stem)  # e.g. src/majority.py -> import majority
-ModelClass = Model.__subclasses__()[0]      # the class that file defined, e.g. Majority
 
-test = load_split(task, split)
-predictions = ModelClass(load_split(task, 'train'), task).predict(test)
-print(f'{task} {split}: accuracy {accuracy(predictions, test["label"]):.2%} (n={len(test)})')
-if 'tier' in test.column_names:
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        sys.exit(__doc__)
+    true_rows = read_jsonl(sys.argv[1])
+    preds = {row_id(row): row['prediction'] for row in read_jsonl(sys.argv[2])}
+    acc = accuracy(true_rows, preds)
+    print(f'accuracy {acc:.2%} (n={len(true_rows)})')
     for tier in ['easy', 'hard']:
-        rows = [(p, l) for p, l, t in zip(predictions, test['label'], test['tier']) if t == tier]
-        print(f'  {tier}: {accuracy(*zip(*rows)):.2%} (n={len(rows)})')
+        subset = [row for row in true_rows if row.get('tier') == tier]
+        if subset:  # matching has no tiers
+            print(f'  {tier}: {accuracy(subset, preds):.2%} (n={len(subset)})')
