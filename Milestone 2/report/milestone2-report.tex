@@ -28,6 +28,16 @@
 }
 \tikzset{chance/.style={dashed, ink2, line width=0.6pt}}
 
+% GPT-4.1-nano accuracies (%), from src/score.py on Milestone 2/gpt-4.1-nano/*.jsonl
+\newcommand{\NMD}{31.45}
+\newcommand{\NMT}{33.90}
+\newcommand{\NRD}{52.73}
+\newcommand{\NRDE}{55.23}
+\newcommand{\NRDH}{50.23}
+\newcommand{\NRT}{54.79}
+\newcommand{\NRTE}{55.74}
+\newcommand{\NRTH}{53.83}
+
 \title{\vspace{-3.5em}Cartoon Caption Matching and Humor Ranking\\\large CIS 4300/5300 Milestone 2: Evaluation and Baselines}
 \author{Alex Yang, Maggie Du, Celia Tung, Chinmay Govind}
 \date{November 18, 2026}
@@ -47,13 +57,13 @@ We test whether models get New Yorker cartoon humor with 2 multiple-choice tasks
 \begin{minipage}[c]{0.75\linewidth}\small
 \textbf{Matching} (test item, contest 575). Which caption belongs to this cartoon?\\
 A: ``Evolution can be so tacky.'' \quad
-\textbf{B: ``Let's pick up the pace. They're billing by the hour.''} (gold)\\
+\textbf{B: ``Let's pick up the pace. They're billing by the hour.''} (correct)\\
 C: ``Well, five acres of popcorn back there says you were.'' \quad
 D: ``I'm sure it works. I was involved in the original research.'' \quad
 E: ``Just water for me, thanks.''\par
 \medskip
 \textbf{Ranking} (hard pair, contest 575). Which caption did the crowd like more?\\
-\textbf{A: ``You're the one who wanted to negotiate.''} (rank 30, gold)\\
+\textbf{A: ``You're the one who wanted to negotiate.''} (rank 30, correct)\\
 B: ``Remember, the lawyers go into battle first. That way we'll be popular whether we win or lose.'' (rank 300)
 \end{minipage}
 \caption{One cartoon, both tasks. Qwen got the matching item right and the ranking pair wrong (it picked B).}
@@ -74,9 +84,9 @@ Ranking & 5,420 (271) & 880 (44) & 940 (47) \\
 No contest shows up in more than one split, so the model never gets tested on a cartoon it trained on. \par
 
 \section{Evaluation measure}
-Both tasks have exactly one right answer per item, so we use accuracy, the same metric Hessel et al.~[1] report for matching. For ranking, accuracy on a pair is just whether the model agreed with the crowd. For $N$ gold items with labels $y_i$ and system predictions $\hat{y}_i$,
+Both tasks have exactly one right answer per item, so we use accuracy, the same metric Hessel et al.~[1] report for matching. For ranking, accuracy on a pair is just whether the model agreed with the crowd. For $N$ items with ground truth labels $y_i$ and system predictions $\hat{y}_i$,
 $$\text{Acc} = \frac{1}{N}\sum_{i=1}^{N} \mathbf{1}[\hat{y}_i = y_i].$$
-A prediction that is missing or can't be parsed into a letter counts as wrong. For ranking we also report accuracy on the easy and hard pairs separately. Our scorer takes a gold file and a predictions file and lines them up by item ID: \par
+A prediction that is missing or can't be parsed into a letter counts as wrong. For ranking we also report accuracy on the easy and hard pairs separately. Our scorer takes a ground truth file and a predictions file and lines them up by item ID: \par
 \vspace{-0.3em}
 {\small\verb|python src/score.py "Milestone 1/data/ranking/test.jsonl" predictions.jsonl|}\par
 
@@ -90,7 +100,7 @@ Our strong baseline adapts the zero-shot setup in Hessel et al.~[1]: show a visi
 
 \textbf{Qwen3.5-4B} [3] is a small open-weight model, which we ran on an NVIDIA L4 in Colab. Images were capped at 512$\times$512 pixels and thinking was turned off. \par
 
-\textbf{GPT-4.1-nano} [4] is OpenAI's cheapest vision model, which we called through Azure OpenAI with temperature 0. Images were sent at the API's \texttt{low} detail setting, which is also 512$\times$512, so both models see the cartoon at about the same resolution. Each item is only about 600 input tokens, so all 2,879 dev and test items cost NANOCOST. \par
+\textbf{GPT-4.1-nano} [4] is OpenAI's cheapest vision model, which we called through Azure OpenAI with temperature 0. Images were sent at the API's \texttt{low} detail setting, which is also 512$\times$512, so both models see the cartoon at about the same resolution. Each item is only about 600 input tokens, so all 2,879 dev and test items cost roughly \$0.20. \par
 
 \section{Results}
 \begin{figure}[H]
@@ -99,15 +109,15 @@ Our strong baseline adapts the zero-shot setup in Hessel et al.~[1]: show a visi
 \toprule
 Task & Split & Maj. & Qwen & nano \\
 \midrule
-Matching & dev  & 19.77 & 47.27 & NMD \\
-Matching & test & 18.37 & 49.62 & NMT \\
+Matching & dev  & 19.77 & 47.27 & \NMD \\
+Matching & test & 18.37 & 49.62 & \NMT \\
 \midrule
-Ranking & dev  & 48.98 & 50.80 & NRD \\
-\quad easy & dev & 45.91 & 48.41 & NRDE \\
-\quad hard & dev & 52.05 & 53.18 & NRDH \\
-Ranking & test & 50.00 & 51.49 & NRT \\
-\quad easy & test & 50.85 & 52.77 & NRTE \\
-\quad hard & test & 49.15 & 50.21 & NRTH \\
+Ranking & dev  & 48.98 & 50.80 & \NRD \\
+\quad easy & dev & 45.91 & 48.41 & \NRDE \\
+\quad hard & dev & 52.05 & 53.18 & \NRDH \\
+Ranking & test & 50.00 & 51.49 & \NRT \\
+\quad easy & test & 50.85 & 52.77 & \NRTE \\
+\quad hard & test & 49.15 & 50.21 & \NRTH \\
 \bottomrule
 \end{tabular}
 \end{minipage}\hfill
@@ -118,13 +128,13 @@ Ranking & test & 50.00 & 51.49 & NRT \\
 \nextgroupplot[width=3.1cm, symbolic x coords={Matching}, xtick=data, enlarge x limits=1.2, ylabel={Test accuracy (\%)}]
   \addplot[fill=maj] coordinates {(Matching,18.37)};
   \addplot[fill=qwen] coordinates {(Matching,49.62)};
-  \addplot[fill=nano] coordinates {(Matching,NMT)};
+  \addplot[fill=nano] coordinates {(Matching,\NMT)};
   \draw[chance] ({rel axis cs:0,0}|-{axis cs:Matching,20}) -- ({rel axis cs:1,0}|-{axis cs:Matching,20});
 \nextgroupplot[width=6.4cm, symbolic x coords={All pairs,Easy,Hard}, xtick=data, enlarge x limits=0.22,
   legend style={at={(0.5,1.03)}, anchor=south}, legend columns=3]
   \addplot[fill=maj] coordinates {(All pairs,50.00) (Easy,50.85) (Hard,49.15)};
   \addplot[fill=qwen] coordinates {(All pairs,51.49) (Easy,52.77) (Hard,50.21)};
-  \addplot[fill=nano] coordinates {(All pairs,NRT) (Easy,NRTE) (Hard,NRTH)};
+  \addplot[fill=nano] coordinates {(All pairs,\NRT) (Easy,\NRTE) (Hard,\NRTH)};
   \draw[chance] ({rel axis cs:0,0}|-{axis cs:Easy,50}) -- ({rel axis cs:1,0}|-{axis cs:Easy,50});
   \legend{Majority, Qwen3.5-4B, GPT-4.1-nano}
 \end{groupplot}
@@ -134,7 +144,9 @@ Ranking & test & 50.00 & 51.49 & NRT \\
 \end{figure}
 \vspace{-0.8em}
 
-RESULTS-DISCUSSION \par
+So, neither strong baseline wins both tasks. Qwen is far better at matching: 49.62\% on test against nano's 33.90\%, though both clear the 20\% chance line. Ranking flips it. Nano gets 54.79\% on test and is the only system meaningfully above the majority baseline, while Qwen sits at 51.49\%. Nano also does worse on hard pairs than easy ones (53.83\% vs.\ 55.74\% on test, 50.23\% vs.\ 55.23\% on dev), which makes sense: ranks 30 and 300 are much closer in quality than ranks 1 and 1000. \par
+
+Both models lean on answer position instead of the captions. Qwen answered B on 826 of 940 ranking test pairs (87.87\%), even though the ground truth labels are split exactly 470/470. Nano's bias is milder and points the other way: it answered A on 591 pairs (62.87\%). Azure's content filter also blocked cartoons 222 and 617 outright, so nano lost 5 matching items and 17 ranking pairs before it ever saw them; those count as wrong. \par
 
 \textbf{Next steps.} Since position bias is the biggest problem on ranking, our first extension will score every pair in both orders and only count a caption as preferred if the model picks it both times. \par
 

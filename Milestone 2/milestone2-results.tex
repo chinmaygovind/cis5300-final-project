@@ -1,0 +1,188 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype,booktabs,tabularx,xcolor,pgfplots,caption,float,graphicx}
+\usepackage[hidelinks]{hyperref}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+
+\definecolor{qwen}{HTML}{2A78D6}   % series 1
+\definecolor{base}{HTML}{EB6834}   % series 2
+\definecolor{ink2}{HTML}{52514E}
+\definecolor{grid}{HTML}{E4E3DF}
+
+\pgfplotsset{
+  every axis/.append style={
+    axis line style={ink2!60}, tick style={draw=none},
+    tick label style={font=\small, color=ink2}, label style={font=\small, color=ink2},
+    ymajorgrids, xmajorgrids=false, grid style={grid, line width=0.4pt},
+    legend style={draw=none, font=\small, text=ink2}, legend cell align=left, area legend,
+  },
+  bar/.style={ybar=7pt, bar width=10pt, line width=0pt, draw=white},
+  vals/.style={nodes near coords={\pgfmathprintnumber[fixed,fixed zerofill,precision=1]{\pgfplotspointmeta}},
+    every node near coord/.append style={font=\tiny, color=black}},
+}
+\tikzset{chance/.style={dashed, ink2, line width=0.6pt}}
+\newcommand{\cq}[1]{``#1''}
+% one example panel: cartoon on top (fixed height, so both panels match), then a small table of captions
+\newcommand{\ex}[3]{%
+\begin{minipage}[t]{0.47\linewidth}\centering
+\parbox[c][5cm][c]{\linewidth}{\centering\fcolorbox{ink2!25}{white}{\includegraphics[height=4.8cm,width=0.95\linewidth,keepaspectratio]{../Milestone 1/data/images/#1.jpg}}}\\[4pt]
+{\small\textbf{#2}}\\[2pt]
+\footnotesize\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{@{}lX@{}}#3\end{tabularx}
+\end{minipage}}
+
+\title{Cartoon Caption Matching and Humor Ranking\\\large Milestone 2 results and examples}
+\author{Alex Yang, Maggie Du, Celia Tung, Chinmay Govind}
+\date{November 12, 2026}
+
+\begin{document}
+\maketitle
+
+\noindent 
+All code/data is available at \url{https://github.com/chinmaygovind/cis5300-final-project}.
+
+\section{Tasks \& Data}
+Our data is from the New Yorker Cartoon Caption Contest, which has run weekly since 2005. Each contest has a cartoon and thousands of captions submitted by readers. The crowd votes on which caption is funniest, and the top 10 are published online. We are considering two tasks from the paper: \\
+\begin{enumerate}
+  \item \textbf{Matching:} pick which of 5 captions was written for the cartoon. 
+  \item \textbf{Ranking:} pick which of 2 captions the crowd rated funnier. Easy ranking pairs compare crowd ranks 1--10 with 1000--1009; hard pairs compare 30--39 with 300--309. \\
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\ex{matching/575}{Matching (contest 575)}{
+A & \cq{Evolution can be so tacky.} \\
+\textbf{B} & \textbf{\cq{Let's pick up the pace. They're billing by the hour.}} \\
+C & \cq{Well, five acres of popcorn back there says you were.} \\
+D & \cq{I'm sure it works. I was involved in the original research.} \\
+E & \cq{Just water for me, thanks.} \\
+\midrule
+& Qwen: \textbf{B} (correct) \\}\hfill
+\ex{ranking/544}{Ranking, easy pair (contest 544)}{
+\textbf{A} & \textbf{\cq{I live in constant fear he will hit ctrl+alt+del}} \mbox{(rank 8)} \\
+B & \cq{It's like we're in a New Yorker cartoon.} \mbox{(rank 1007)} \\
+\midrule
+& Qwen: \textbf{A} (correct) \\}
+\end{figure}
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+Task & Train & Dev & Test \\
+\midrule
+Matching (items / contests) & 4,896 / 422 & 531 / 141 & 528 / 141 \\
+Ranking (pairs / contests)  & 5,420 / 271 & 880 / 44  & 940 / 47  \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+No contest appears in more than one split.
+
+\section{Methods}
+We used 3 methods for both tasks for this milestone. We score all of them with accuracy, the fraction of items where the predicted letter matches the ground truth letter; a reply that isn't a single valid letter counts as wrong.
+\begin{enumerate}
+  \item \textbf{Majority}, where we just pick the most common training label (E for matching, B for ranking). This is basically a random guess for matching and a coin flip for ranking, but it's the simplest baseline possible.
+  \item \textbf{Qwen3.5-4B}, a 4B-parameter open-weight vision-language model, so it sees the cartoon itself and not just a description. We ran it zero-shot (no fine-tuning, no examples in the prompt) with Hugging Face \texttt{transformers} on an NVIDIA L4 GPU in Colab, in bfloat16 with greedy decoding and thinking turned off. Images were capped at 512$\times$512 pixels.
+  \item \textbf{GPT-4.1 nano}, OpenAI's cheapest vision model, called zero-shot through Azure OpenAI with temperature 0. Images were sent at the API's \texttt{low} detail setting, which is also 512$\times$512, so both models see the cartoon at about the same resolution. Azure's content filter rejects a few cartoons outright; those count as wrong.
+\end{enumerate}
+Both models get exactly the same prompt: the cartoon, then a one-line instruction (\cq{Choose the caption originally written for this cartoon.} for matching, \cq{Choose the caption that New Yorker caption-contest readers rated as funnier for this cartoon.} for ranking), the lettered captions, and \cq{Reply with exactly one letter.}
+
+\section{Results}
+\begin{center}
+\begin{tabular}{llrr}
+\toprule
+Task & Split & Majority baseline & Qwen3.5-4B \\
+\midrule
+Matching & dev  & 19.77\% (105/531) & 47.27\% (251/531) \\
+Matching & test & 18.37\% (97/528)  & \textbf{49.62\%} (262/528) \\
+\midrule
+Ranking  & dev  & 48.98\% (431/880) & 50.80\% (447/880) \\
+\quad easy & dev & 45.91\% (202/440) & 48.41\% (213/440) \\
+\quad hard & dev & 52.05\% (229/440) & 53.18\% (234/440) \\
+Ranking  & test & 50.00\% (470/940) & \textbf{51.49\%} (484/940) \\
+\quad easy & test & 50.85\% (239/470) & 52.77\% (248/470) \\
+\quad hard & test & 49.15\% (231/470) & 50.21\% (236/470) \\
+\bottomrule
+\end{tabular}
+\end{center}
+The majority baseline always answers the most common training label (E for matching, B for ranking).
+Qwen produced no unparsable answers in any run. On test, Qwen beats the baseline by
++31.25 points on matching but only +1.49 on ranking.
+
+% \begin{figure}[H]
+% \centering
+% \begin{tikzpicture}
+% \begin{groupplot}[group style={group size=2 by 1, horizontal sep=1.4cm},
+%   height=5.6cm, ymin=0, ymax=108, ytick={0,20,...,100}, ylabel={Test accuracy (\%)}, vals, legend columns=2]
+% \nextgroupplot[bar, width=4.6cm, symbolic x coords={Matching}, xtick=data, enlarge x limits=1.2,
+%   title={\small Matching (5 options)}]
+%   \addplot[fill=base] coordinates {(Matching,18.37)};
+%   \addplot[fill=qwen] coordinates {(Matching,49.62)};
+%   \draw[chance] ({rel axis cs:0,0}|-{axis cs:Matching,20}) -- ({rel axis cs:1,0}|-{axis cs:Matching,20});
+% \nextgroupplot[bar, width=9cm, symbolic x coords={All pairs,Easy,Hard}, xtick=data, enlarge x limits=0.25,
+%   title={\small Ranking (2 options)}, legend to name=accleg]
+%   \addplot[fill=base] coordinates {(All pairs,50.00) (Easy,50.85) (Hard,49.15)};
+%   \addplot[fill=qwen] coordinates {(All pairs,51.49) (Easy,52.77) (Hard,50.21)};
+%   \draw[chance] ({rel axis cs:0,0}|-{axis cs:Easy,50}) -- ({rel axis cs:1,0}|-{axis cs:Easy,50});
+%   \legend{Majority baseline, Qwen3.5-4B}
+% \end{groupplot}
+% \end{tikzpicture}\\[2pt]
+% \ref*{accleg}
+% \caption{Test accuracy; the dashed line is chance. Qwen clears chance by a wide margin on matching but sits at chance on ranking.}
+% \end{figure}
+
+% \section{Position bias in ranking}
+% Qwen answered B on 826 of 940 ranking test pairs (87.87\%) and 812 of 880 dev pairs (92.27\%),
+% although the true answers are split almost evenly.
+
+% \paragraph{Order-swap test (ranking dev).} We kept each cartoon and caption pair but swapped
+% which caption is A and which is B. A model judging humor should pick the same caption both times.
+
+% \begin{center}
+% \begin{tabular}{lrr}
+% \toprule
+% Outcome across the two orders & Pairs & Share \\
+% \midrule
+% Same caption both times (A$\to$B 68, B$\to$A 91) & 159 & 18.07\% \\
+% Said ``B'' both times, so picked a \emph{different} caption & 721 & 81.93\% \\
+% Correct in both orders & 98 & 11.14\% \\
+% \midrule
+% Accuracy, original order $\to$ swapped order & \multicolumn{2}{r}{50.80\% $\to$ 53.41\%} \\
+% \bottomrule
+% \end{tabular}
+% \end{center}
+% \noindent Qwen is mostly answering by position, not by which caption is funnier. This is the
+% main target for the extension (for example, scoring each pair in both orders and combining them).
+
+% \begin{figure}[H]
+% \centering
+% \begin{minipage}[b]{0.47\linewidth}\centering
+% \begin{tikzpicture}
+% \begin{axis}[bar, height=5.2cm, width=0.92\linewidth, ymin=0, ymax=108, ytick={0,20,...,100}, ylabel={Pairs answered ``B'' (\%)},
+%   symbolic x coords={Dev,Test}, xtick=data, enlarge x limits=0.5, vals,
+%   legend style={at={(0.5,1.03)}, anchor=south}, legend columns=1]
+%   \addplot[fill=base] coordinates {(Dev,48.98) (Test,50.00)};
+%   \addplot[fill=qwen] coordinates {(Dev,92.27) (Test,87.87)};
+%   \legend{Correct answer is B, Qwen answered B}
+% \end{axis}
+% \end{tikzpicture}
+% \caption{How often B is the right answer vs.\ how often Qwen says B.}
+% \end{minipage}\hfill
+% \begin{minipage}[b]{0.47\linewidth}\centering
+% \begin{tikzpicture}
+% \begin{axis}[xbar, bar width=12pt, line width=0pt, height=4.2cm, width=0.92\linewidth, xmin=0, xmax=880,
+%   xlabel={Ranking dev pairs (of 880)}, symbolic y coords={Other caption,Same caption},
+%   yticklabels={{Other caption},{Same caption}}, ytick=data, enlarge y limits=0.6,
+%   xmajorgrids, ymajorgrids=false, nodes near coords,
+%   every node near coord/.append style={font=\scriptsize, color=black}]
+%   \addplot[fill=qwen, draw=white] coordinates {(721,Other caption) (159,Same caption)};
+% \end{axis}
+% \end{tikzpicture}
+% \caption{Which caption Qwen chose after A and B were swapped.}
+% \end{minipage}
+% \end{figure}
+
+\end{document}
